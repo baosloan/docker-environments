@@ -1,0 +1,20 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      LANG: C.UTF-8
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - ${PWD}/conf:/etc/mysql/conf.d
+      - ${PWD}/data:/var/lib/mysql
+    networks:
+      - develop
+
+networks:
+  develop:
+    external: true # 声明使用外部网络
