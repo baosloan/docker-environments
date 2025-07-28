@@ -1,0 +1,16 @@
+services:
+  memcached:
+    image: memcached:1.6
+    container_name: memcached
+    restart: always
+    ports:
+      - "11211:11211"
+    command:
+      - --conn-limit=1024
+      - --memory-limit=64
+      - --threads=4
+    networks:
+      - develop
+networks:
+  develop:
+    external: true
