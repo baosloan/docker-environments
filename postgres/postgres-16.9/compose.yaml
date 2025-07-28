@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:16.9
+    container_name: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    shm_size: 256mb
+    environment:
+      - POSTGRES_PASSWORD=root
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - TZ=Asia/Shanghai
+    volumes:
+      - ${PWD}/data:/var/lib/postgresql/data
+    networks:
+      - develop
+networks:
+  develop:
+    external: true
