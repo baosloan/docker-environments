@@ -14,6 +14,7 @@ Just to record the docker development environment。
 - Container模式
     - 共享指定容器的Network Namespace，IP和端口一致。适用监控或日志收集。
     
+
 问题：默认情况下所有容器通过`docker0`网桥相连，相互都可访问，缺乏安全性。
 解决：创建独立网络，实现逻辑隔离。
 好处：
@@ -40,10 +41,7 @@ gateway(网关)的作用
 3.出站流量NAT转换
 关键功能：容器访问外网时，网关将其私有IP转换为宿主机的公网IP。
 
-graph LR
-  A[容器 IP:192.168.100.2] -->|发送请求| B[网关:192.168.100.1]
-  B -->|NAT 转换| C[宿主机公网IP:203.0.113.5]
-  C -->|访问互联网| D[Google.com]
+![deepseek_mermaid](./README.assets/deepseek_mermaid.svg)
 
 网络分层
 
