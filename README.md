@@ -54,12 +54,14 @@ gateway(网关)的作用
 网络分段方案：
 1.前端网络(frontend-net)
 用途：托管Web服务器(如Nginx)、负载均衡器、前端应用。
+
 ```shell
 docker network create --driver bridge --subnet 10.10.1.0/24 --gateway 10.10.1.1 frontend-net
 ```
 策略：
 - 允许外部访问：映射80/443端口到宿主机。
 - 仅允许访问`backend-net`(应用层)的特定端口(如8080)。
+- docker run -d --name nginx --network frontend-net -p 80:80 nginx
 
 2.应用层网络(backend-net)
 用途：运行业务应用(如Java/Go/Python微服务).
@@ -70,6 +72,7 @@ docker network create --driver bridge --subnet 10.10.20/24 --gateway 10.10.2.1 b
 - 禁止外部直接访问(不映射端口到宿主机)。
 - 允许接收来自`frontend-net`的请求。
 - 允许访问`database-net`的数据库端口（如MySQL的3306）。
+-  docker network connect backend-net nginx
 
 3.数据库网络(database-net)
 用途：运行数据库(MySQL、PostgreSQL)、缓存(Redis)。
@@ -91,3 +94,5 @@ docker network create --driver bridge --subnet 10.10.4.0/24 --gateway 10.10.4.1 
 策略：
 - 允许所有网络访问监控的API端口（如9090、3000）。
 - 监控组件主动抓取其他网络的容器（需显式连接）。
+
+![deepseek_mermaid_net_tupo](./README.assets/deepseek_mermaid_net_tupo.svg)
