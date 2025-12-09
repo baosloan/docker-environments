@@ -1,0 +1,20 @@
+services:
+  nginx:
+    image: nginx:1.26.3
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ${PWD}/conf/conf.d:/etc/nginx/conf.d
+      - ${PWD}/conf/nginx.conf:/etc/nginx/nginx.conf
+      - /Users/kevin/code/php:/usr/share/nginx/html
+      - ${PWD}/log:/var/log/nginx
+    networks:
+      develop:
+        ipv4_address: 10.10.1.1
+
+networks:
+  develop:
+    external: true # 声明使用外部网络
