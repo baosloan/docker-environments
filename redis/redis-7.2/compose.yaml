@@ -1,6 +1,6 @@
 services:
   redis:
-    image: redis:7.2.10
+    image: redis:7.2.12
     container_name: redis
     restart: always
     environment:
@@ -14,7 +14,13 @@ services:
       - develop
     command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
 
-
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    
 networks:
   develop:
     external: true
