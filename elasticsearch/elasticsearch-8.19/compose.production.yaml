@@ -1,0 +1,63 @@
+services:
+  elasticsearch:
+    image: baosloan/elasticsearch-ik:8.19.7
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "TZ=Asia/Shanghai"
+      - "ES_JAVA_OPTS=-Xms4g -Xmx4g"
+      # 启用安全但使用密码认证
+      - xpack.security.enabled=true
+      - xpack.security.enrollment.enabled=false  # 禁用注册令牌
+      - xpack.security.http.ssl.enabled=false    # 禁用 HTTPS
+      - xpack.security.transport.ssl.enabled=false
+      # 设置初始密码
+      - ELASTIC_PASSWORD=Avx-MZT-oXD-iWS
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      # 单独挂载配置文件（最安全，保留了官方的主词典）
+      - ${PWD}/data:/usr/share/elasticsearch/data
+      - ${PWD}/log:/usr/share/elasticsearch/logs
+      # IK分词器会从 /usr/share/elasticsearch/config/analysis-ik/ 目录加载配置
+      - ${PWD}/ik-config/IKAnalyzer.cfg.xml:/usr/share/elasticsearch/config/analysis-ik/IKAnalyzer.cfg.xml:ro
+      - ${PWD}/ik-config/custom.dic:/usr/share/elasticsearch/config/analysis-ik/custom.dic:ro
+      - ${PWD}/ik-config/stop.dic:/usr/share/elasticsearch/config/analysis-ik/stop.dic:ro
+    ports:
+      - "9200:9200"
+    networks:
+      - develop
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u elastic:Avx-MZT-oXD-iWS http://localhost:9200 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kibana:
+    image: kibana:8.19.7
+    container_name: kibana
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      - I18N_LOCALE=zh-CN
+      - "TZ=Asia/Shanghai"
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_PUBLICBASEURL=http://localhost:5601
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=bpc-Seb-DSt-BeT
+      - XPACK_SECURITY_ENABLED=true
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=8H3kL9mP2qR5sT7vW0xY1zA3bC6dE9fG
+    ports:
+      - "5601:5601"
+    networks:
+      - develop
+networks:
+  develop:
+    external: true
