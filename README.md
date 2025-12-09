@@ -22,20 +22,19 @@ Just to record the docker development environment。
     子网管理：自定义IP地址段，避免IP冲突。
 
 ```shell
-docker network create develop
-docker network create --driver bridge --subnet 192.168.100.0/24 --gateway 192.168.100.1 develop
+$ docker network create --driver=bridge --subnet=10.10.0.0/16 --gateway=10.10.0.1 develop 
 ```
 gateway(网关)的作用
 1.内外网流量的路由
 - 角色：网关是网络的“出口”，负责转发容器到外部网络的请求(如访问互联网)。
-- 典型值：通常为子网的第一个IP(如192.168.100.1)。
+- 典型值：通常为子网的第一个IP(如10.10.0.1)。
 
 2.跨网段通信
 场景：容器访问非本地子网的目标(如另一物理网络中的数据)。
 通信流程：
 - 容器内执行ping 8.8.8.8(Google DNS).
-- 数据包目标8.8.8.8不在192.168.100.0/24子网内。
-- 容器将数据包发送给网关192.168.100.1(网关通常为子网的第一个IP).
+- 数据包目标8.8.8.8不在10.10.0.0/16子网内。
+- 容器将数据包发送给网关10.10.0.1(网关通常为子网的第一个IP).
 - 网关通过宿主机进行NAT转换，访问互联网。
 
 3.出站流量NAT转换
@@ -66,13 +65,14 @@ docker network create --driver bridge --subnet 10.10.1.0/24 --gateway 10.10.1.1 
 2.应用层网络(backend-net)
 用途：运行业务应用(如Java/Go/Python微服务).
 ```shell
-docker network create --driver bridge --subnet 10.10.20/24 --gateway 10.10.2.1 backend-net
+docker network create --driver bridge --subnet 10.10.2.0/24 --gateway 10.10.2.1 backend-net
 ```
 策略：
 - 禁止外部直接访问(不映射端口到宿主机)。
 - 允许接收来自`frontend-net`的请求。
 - 允许访问`database-net`的数据库端口（如MySQL的3306）。
--  docker network connect backend-net nginx
+- docker network connect backend-net nginx
+- docker run --name app-service --network backend-net my-app-image
 
 3.数据库网络(database-net)
 用途：运行数据库(MySQL、PostgreSQL)、缓存(Redis)。
@@ -84,6 +84,7 @@ docker network create --driver bridge --subnet 10.10.3.0/24 --gateway 10.10.3.1 
 策略：
 - 仅允许`backend-net`的应用层容器访问。
 - 完全隔离外部互联网(无NAT出站)。
+- docker network connect database-net app-service
 
 4.监控与日志网络(monitoring-net)
 用途：部署Prometheus、Grafana、ELK等监控组件。
@@ -96,3 +97,36 @@ docker network create --driver bridge --subnet 10.10.4.0/24 --gateway 10.10.4.1 
 - 监控组件主动抓取其他网络的容器（需显式连接）。
 
 ![deepseek_mermaid_net_tupo](./README.assets/deepseek_mermaid_net_tupo.svg)
+
+
+
+## 网段规划
+
+- Nginx - 10.10.1.0
+  - Nginx1.26 - 10.10.1.1
+- MySQL - 10.10.2.0
+  - MySQL8.4.6单机版 - 10.10.2.1
+  - MySQL5.7单机版 - 10.10.2.2
+  - 集群node1 - 10.10.2.3
+  - 集群node2 - 10.10.2.4
+  - 集群node3 - 10.10.2.5
+- Redis - 10.10.3.0
+  - Redis-7.2.10单机版 - 10.10.3.1
+  - Redis-6单机版 - 10.10.3.2
+  - Redis-5单机版 - 10.10.3.3
+  - 集群node1 10.10.3.4
+  - 集群node2 10.10.3.5
+  - 集群node3 10.10.3.6
+  - Cluster 10.10.3.7
+  - Cluster 10.10.3.8
+  - Cluster 10.10.3.9
+- RabbitMQ - 10.10.4.0
+- Postgresql - 10.10.5.0
+- Memcached - 10.10.6.0
+- Elasticsearch - 10.10.7.0
+- Kafka - 10.10.8.0
+- MongoDB - 10.10.9.0
+- PHP - 10.10.10.0
+- Consul - 10.10.11.0
+- Etcd - 10.10.12.0
+- Zentao - 10.10.13.0
