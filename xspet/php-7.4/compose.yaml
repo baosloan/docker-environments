@@ -1,0 +1,19 @@
+services:
+  php:
+    image: baosloan/php-fpm:xspet
+    platform: linux/amd64
+    container_name: php7
+    restart: always
+    volumes:
+      - ${PWD}/conf/www.conf:/usr/local/etc/php-fpm.d/www.conf
+      - ${PWD}/conf/php.ini:/usr/local/etc/php/php.ini
+      - /Users/kevin/code/php:/var/www/html
+    networks:
+      develop:
+        ipv4_address: 10.10.10.1
+volumes:
+  data:
+    driver: local
+networks:
+  develop:
+    external: true
