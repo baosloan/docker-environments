@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  mysql-master:
+    image: mysql:8.4.6
+    container_name: mysql-master
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: repl
+      MYSQL_PASSWORD: repl123
+    ports:
+      - "3316:3306"
+    volumes:
+      - ./init-scripts:/docker-entrypoint-initdb.d
+      - mysql-master-data:/var/lib/mysql
+    networks:
+      - mysql-cluster
+    command: --server-id=1 --log-bin=mysql-bin --binlog-format=ROW --binlog-do-db=testdb
+
+  mysql-slave1:
+    image: mysql:8.4.6
+    container_name: mysql-slave1
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: testdb
+    ports:
+      - "3317:3306"
+    volumes:
+      - mysql-slave1-data:/var/lib/mysql
+    networks:
+      - mysql-cluster
+    depends_on:
+      - mysql-master
+    command: --server-id=2 --relay-log=mysql-relay-bin --read-only=1 --replicate-do-db=testdb
+
+  mysql-slave2:
+    image: mysql:8.4.6
+    container_name: mysql-slave2
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: testdb
+    ports:
+      - "3318:3306"
+    volumes:
+      - mysql-slave2-data:/var/lib/mysql
+    networks:
+      - mysql-cluster
+    depends_on:
+      - mysql-master
+    command: --server-id=3 --relay-log=mysql-relay-bin --read-only=1 --replicate-do-db=testdb
+
+volumes:
+  mysql-master-data:
+  mysql-slave1-data:
+  mysql-slave2-data:
+
+networks:
+  mysql-cluster:
+    driver: bridge
