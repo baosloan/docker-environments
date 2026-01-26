@@ -1,6 +1,6 @@
 services:
   elasticsearch:
-    image: baosloan/elasticsearch-ik:8.19.7
+    image: baosloan/elasticsearch-ik:8.19.10
     container_name: elasticsearch
     restart: always
     environment:

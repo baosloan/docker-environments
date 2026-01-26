@@ -3,13 +3,13 @@
 构建单架构
 
 ```shell
-docker build -t baosloan/elasticsearch-ik:8.19.7 .
+docker build -t baosloan/elasticsearch-ik:8.19.10 .
 ```
 
 构建多架构镜像
 
 ```shell
-$ docker buildx build --platform linux/amd64,linux/arm64 -t baosloan/elasticsearch-ik:8.19.7 -t baosloan/elasticsearch-ik:latest --push .
+$ docker buildx build --platform linux/amd64,linux/arm64 -t baosloan/elasticsearch-ik:8.19.10 -t baosloan/elasticsearch-ik:latest --push .
 ```
 
 
@@ -19,7 +19,7 @@ $ docker buildx build --platform linux/amd64,linux/arm64 -t baosloan/elasticsear
 ```yaml
 services:
   elasticsearch:
-    image: baosloan/elasticsearch-ik:8.19.7
+    image: baosloan/elasticsearch-ik:8.19.10
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
@@ -48,7 +48,7 @@ services:
       - develop
 
   kibana:
-    image: kibana:8.19.7
+    image: kibana:8.19.10
     container_name: kibana
     depends_on:
       - elasticsearch
@@ -71,7 +71,7 @@ networks:
 ```yaml
 services:
   elasticsearch:
-    image: baosloan/elasticsearch-ik:8.19.7
+    image: baosloan/elasticsearch-ik:8.19.10
     container_name: elasticsearch
     restart: unless-stopped
     environment:
@@ -112,7 +112,7 @@ services:
       retries: 5
 
   kibana:
-    image: kibana:8.19.7
+    image: kibana:8.19.10
     container_name: kibana
     restart: unless-stopped
     depends_on:
