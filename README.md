@@ -1,14 +1,62 @@
 # Docker Development Environments
 
+Just to record the docker development environment。
+
 ## 镜像
+
+### Docker镜像命令
+
+```shell
+# 删除所有镜像
+docker rmi -f $(docker images -aq)
+```
 
 
 
 ## 容器
 
+### Docker容器命令
+
+```shell
+# 从镜像仓库拉取镜像
+docker pull $image_name:$version
+# 删除所有容器
+docker rm -f $(docker ps -aq)
+```
 
 
-Just to record the docker development environment。
+
+## 系统
+
+### Docker系统命令
+
+```shell
+# 查看磁盘使用概况
+docker system df
+
+# 查看详细空间使用(包含镜像、容器、卷等)
+docker system df -v
+
+# 输出格式化为人类可读
+docker system df --human
+
+# 清理所有未使用的资源(交互式确认)
+docker system prune
+
+# 强制清理(无需确认)
+docker system prune -f
+
+# 清理所有未使用的资源，包括未使用的镜像
+docker system prune -a
+
+# 清理并同时清理卷(谨慎使用！会删除未使用的卷)
+docker system prune --volumes
+
+# 组合使用：清理所有未使用的镜像、容器、卷
+docker system prune -a --volumes -f
+```
+
+
 
 ## 网络
 
@@ -156,6 +204,15 @@ docker network inspect bridge
 
 # 2. 创建自定义网络
 docker network create --driver=bridge --subnet=10.10.0.0/16 --gateway=10.10.0.1 develop
+docker network create \
+--driver=bridge \
+--subnet=10.10.0.0/16 \
+--gateway=10.10.0.1 \
+--opt com.docker.network.bridge.enable_icc=true \
+--opt com.docker.network.bridge.enable_ip_masquerade=true \
+--opt com.docker.network.bridge.host_binding_ipv4=0.0.0.0 \
+--opt com.docker.network.driver.mtu=65535 \
+develop
 docker network create \
 --driver=bridge \
 --subnet=10.10.0.0/16 \
